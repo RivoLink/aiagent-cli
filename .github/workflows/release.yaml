@@ -1,0 +1,93 @@
+name: Release
+
+on:
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
+    branches:
+      - release-*
+
+jobs:
+  release:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout ${{github.event.ref}}
+        uses: actions/checkout@v4
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Setup Git Config
+        run: |
+          git config user.email "rivo.link@gmail.com"
+          git config user.name "RivoLink"
+
+      - name: Setup PHP
+        uses: "shivammathur/setup-php@v2"
+        with:
+          php-version: "8.1"
+
+      - name: Composer Install
+        uses: "ramsey/composer-install@v3"
+
+      - name: Install Box Globally
+        run: |
+          composer global require humbug/box
+          box --version
+
+      - name: Compute Variables
+        run: |
+          cp .env .env.local
+
+      - name: Compute Version
+        run: |
+          branch=$(jq -r '.workflow_run.head_branch' "$GITHUB_EVENT_PATH")
+          echo "BRANCH=$branch" >> "$GITHUB_ENV"
+          php config/version.php --release="${branch#release-}"
+
+      - name: Load Version
+        run: |
+          version=$(grep 'APP_VERSION' .env | sed "s/[\"']//g" | awk '{print $3}')
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Remove Vendor
+        run: |
+          rm -rf vendor
+
+      - name: Composer Install (No Dev)
+        uses: "ramsey/composer-install@v3"
+        with:
+          composer-options: "--no-dev --no-interaction"
+
+      - name: Compile Project
+        run: |
+          rm -rf bin/*
+          box compile --config=boxconfig.json
+
+      - name: Setup Artifact
+        run: |
+          mkdir cache
+          cp "bin/index.phar" "cache/index-${{env.VERSION}}.phar"
+          echo "ARTIFACT=cache/index-${{env.VERSION}}.phar" >> "$GITHUB_ENV"
+
+      - name: Commit Changes
+        run: |
+          git add .
+          git commit -m "${{env.VERSION}}"
+
+      - name: Push Changes
+        run: |
+          git push origin main
+
+      - name: Remove Branch
+        run: |
+          git push origin --delete "${{env.BRANCH}}"
+
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        run: |
+          gh release create "${{env.VERSION}}" "${{env.ARTIFACT}}" --generate-notes

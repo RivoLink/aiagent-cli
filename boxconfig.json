@@ -1,0 +1,15 @@
+{
+    "main": "index.php",
+    "output": "bin/index.phar",
+    "chmod": "0777",
+    "compression": "GZ",
+    "files": [
+        ".env.local",
+        "composer.json"
+    ],
+    "directories": [
+        "app",
+        "config",
+        "vendor"
+    ]
+}

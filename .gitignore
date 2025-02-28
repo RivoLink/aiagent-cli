@@ -1,0 +1,16 @@
+# env
+/.env.local
+
+# config
+/config/.phpecs
+/config/.phpunit.result.cache
+
+# composer
+/vendor/
+
+# cache
+/cache/
+
+# custom
+*.rl
+/notes/
