@@ -2,5 +2,5 @@ parameters:
 	level: max
 	paths:
 		- ./../app/
-		- ./../index.php
+		- ./../aiagent.php
 	ignoreErrors: []

@@ -1,6 +1,6 @@
 {
-    "main": "index.php",
-    "output": "bin/index.phar",
+    "main": "aiagent.php",
+    "output": "bin/aiagent.phar",
     "chmod": "0777",
     "compression": "GZ",
     "files": [

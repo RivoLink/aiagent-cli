@@ -1,6 +1,6 @@
 {
-    "name": "rivolink/composer-template",
-    "description": "A template for setting up a PHP project using Composer, including tools for coding standards and testing.",
+    "name": "rivolink/aiagent",
+    "description": "An AI assistant for quick spelling correction, code generation, and other instant AI-powered help.",
     "license": "MIT",
     "autoload": {
         "psr-4": {
