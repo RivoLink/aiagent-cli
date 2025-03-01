@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 require __DIR__.'/config/autoload.php';
@@ -8,7 +9,7 @@ use App\Model\Project;
 use App\Model\Request;
 
 /** @var array<string, string> */
-$PARAMS = getOpt('', ['spelling::', 'translate::']);
+$PARAMS = getOpt('', ['spelling::', 'translate::', 'help']);
 
 $TEXT = null;
 $ACTION = null;
@@ -21,8 +22,14 @@ foreach ($PARAMS as $action => $text) {
     }
 }
 
-if (!$ACTION || !$TEXT) {
-    exit(Console::out('error', 'Parameter "spelling" or "translate" required.'));
+if (isset($PARAMS['help']) || !$ACTION || !$TEXT) {
+    exit(Console::out('text', implode(PHP_EOL, [
+        'Usage: php script.php --spelling="text" | --translate="text"',
+        'Options:',
+        '    --spelling   Corrects the spelling of the provided text.',
+        '    --translate  Translates the provided text.',
+        '    --help       Displays this help message.',
+    ])));
 }
 
 $output = Process::async(message: 'Processing', callback: function () use ($ACTION, $TEXT) {

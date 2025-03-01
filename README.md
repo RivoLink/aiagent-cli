@@ -27,11 +27,13 @@ Run **AI Agent** from the command line with one of the following options:
 ```sh
 php aiagent.php --spelling="your text here"
 php aiagent.php --translate="your text here"
+php aiagent.php --help
 ```
 
 ### Parameters
 - `--spelling`: Corrects the spelling of the provided text.
 - `--translate`: Translates the provided text.
+- `--help`: Displays usage information and available options.
 
 ## Example
 ```sh
