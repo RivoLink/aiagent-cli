@@ -12,6 +12,7 @@ class Console
 
     public static function out(string $type, string $message, int $return = 0, string $suffix = ''): int {
         $colors = [
+            'text' => "\033[0m", // None
             'error' => "\033[31m", // Red
             'info' => "\033[34m", // Blue
             'success' => "\033[32m", // Green
@@ -20,6 +21,7 @@ class Console
         ];
 
         $prefixes = [
+            'text' => null,
             'error' => '[ERRO]: ',
             'info' => '[INFO]: ',
             'success' => '[SUCC]: ',
@@ -27,7 +29,7 @@ class Console
         ];
 
         if (!isset($colors[$type]) || !isset($prefixes[$type])) {
-            $type = 'info';
+            $type = 'text';
         }
 
         echo trim($colors[$type].$prefixes[$type].$message.$colors['reset'].self::SPACE.$suffix).PHP_EOL;

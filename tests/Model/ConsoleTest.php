@@ -22,7 +22,7 @@ class ConsoleTest extends TestCase
         Console::out('unknown', 'This is an unknown message');
 
         $output = ob_get_clean();
-        $expected = "\033[34m[INFO]: This is an unknown message\033[0m".PHP_EOL;
+        $expected = "\033[0mThis is an unknown message\033[0m".PHP_EOL;
 
         $this->assertEquals($expected, $output);
     }
