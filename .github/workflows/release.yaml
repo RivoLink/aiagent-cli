@@ -72,8 +72,8 @@ jobs:
       - name: Setup Artifact
         run: |
           mkdir cache
-          cp "bin/index.phar" "cache/index-${{env.VERSION}}.phar"
-          echo "ARTIFACT=cache/index-${{env.VERSION}}.phar" >> "$GITHUB_ENV"
+          cp "bin/aiagent.phar" "cache/aiagent-${{env.VERSION}}.phar"
+          echo "ARTIFACT=cache/aiagent-${{env.VERSION}}.phar" >> "$GITHUB_ENV"
 
       - name: Commit Changes
         run: |
