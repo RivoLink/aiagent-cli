@@ -60,4 +60,42 @@ class ProjectTest extends TestCase
         $actual = Project::env('NON_EXISTENT_KEY');
         $this->assertEquals($expected, $actual);
     }
+
+    public function testExecReturnsCorrectOutputForSuccessfulCommand() {
+        $cmd = 'echo "Hello, World!"';
+        list($output, $errors) = Project::exec($cmd);
+
+        $this->assertNotNull($output);
+        $this->assertNull($errors);
+
+        $this->assertEquals(['Hello, World!'], $output);
+    }
+
+    public function testExecReturnsCorrectOutputForFailedCommand() {
+        $cmd = 'nonexistent_command';
+        list($output, $errors) = Project::exec($cmd);
+
+        $this->assertNull($output);
+        $this->assertNotNull($errors);
+
+        $this->assertStringContainsString('not found', implode(' ', $errors));
+    }
+
+    public function testExecCallsCallbackWithCorrectArguments() {
+        $cmd = 'echo "Hello, World!"';
+        $callbackCalled = false;
+
+        $callback = function ($result, $errors) use (&$callbackCalled) {
+            $callbackCalled = true;
+
+            $this->assertNotNull($result);
+            $this->assertNull($errors);
+
+            $this->assertEquals(['Hello, World!'], $result);
+        };
+
+        Project::exec($cmd, $callback);
+
+        $this->assertTrue($callbackCalled);
+    }
 }
