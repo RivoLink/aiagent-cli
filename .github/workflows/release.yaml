@@ -43,6 +43,7 @@ jobs:
       - name: Compute Variables
         run: |
           cp .env .env.local
+          php config/envlocal.php -k="WEBHOOK_TOKEN" -v="${{secrets.WEBHOOK_TOKEN}}"
 
       - name: Compute Version
         run: |

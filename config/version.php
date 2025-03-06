@@ -43,4 +43,7 @@ switch ($release) {
         die("Error: Invalid release type $release".PHP_EOL);
 }
 
-Project::set($env, "APP_VERSION", "$major.$minor.$patch");
+$VERSION = "$major.$minor.$patch";
+
+Project::set($env, "APP_VERSION", $VERSION);
+Project::exec("composer config version $VERSION");
