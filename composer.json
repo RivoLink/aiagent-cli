@@ -1,7 +1,7 @@
 {
     "name": "rivolink/aiagent",
     "description": "An AI assistant for quick spelling correction, code generation, and other instant AI-powered help.",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "license": "MIT",
     "autoload": {
         "psr-4": {
