@@ -3,6 +3,7 @@
 
 require __DIR__.'/config/autoload.php';
 
+use App\Model\AIAgent;
 use App\Model\Console;
 use App\Model\Process;
 use App\Model\Project;
@@ -10,6 +11,9 @@ use App\Model\Request;
 
 /** @var array<string, string> */
 $PARAMS = getOpt('', ['spelling::', 'translate::', 'help']);
+
+/** @var string $SELF */
+$SELF = $_SERVER['PHP_SELF'];
 
 $TEXT = null;
 $ACTION = null;
@@ -23,13 +27,7 @@ foreach ($PARAMS as $action => $text) {
 }
 
 if (isset($PARAMS['help']) || !$ACTION || !$TEXT) {
-    exit(Console::out('text', implode(PHP_EOL, [
-        'Usage: php script.php --spelling="text" | --translate="text"',
-        'Options:',
-        '    --spelling   Corrects the spelling of the provided text.',
-        '    --translate  Translates the provided text.',
-        '    --help       Displays this help message.',
-    ])));
+    exit(AIAgent::help($SELF));
 }
 
 $output = Process::async(message: 'Processing', callback: function () use ($ACTION, $TEXT) {
