@@ -1,0 +1,328 @@
+{
+  "name": "AI Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "aiagent/lexifix",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -500,
+        -120
+      ],
+      "id": "99c6bc78-211f-4ad0-9b75-7d24a1142d57",
+      "name": "Webhook",
+      "webhookId": "934974ba-4d16-473e-a421-5cd2093c9fd6",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "gJWmvo6rrfHSfrrd",
+          "name": "Bearer Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"code\": 200,\n  \"status\": \"SUCCESS\",\n  \"output\": \"{{ $json.output }}\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        960,
+        -120
+      ],
+      "id": "56fe856b-1fde-46b1-886c-587472fbd4dd",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "content": "## Spelling Corrector and Translator\nAn AI assistant for quick **spelling correction** and **translation**.",
+        "height": 580,
+        "width": 1800,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -580,
+        -260
+      ],
+      "id": "754613e7-3a36-4f9c-8b3d-ba204f134b03",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "model": "mistral-medium",
+        "options": {
+          "maxTokens": 128
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        340,
+        180
+      ],
+      "id": "a8b213eb-585f-43d3-81f4-448abe5b78ff",
+      "name": "Mistral Model",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "1oY1oRgfKKEV8Qs0",
+          "name": "Mistral Cloud"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const action = $('Fields').first().json.action\nconst text = JSON.stringify($input.first().json.text);\n\nvar match = text.match(/<translated>(.*?)<\\/translated>/)\n\nif (action == 'spelling') {\n  match = text.match(/<corrected>(.*?)<\\/corrected>/);\n}\n\nreturn {\n  'output': match ? match[1] : 'Webhook error'\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        -120
+      ],
+      "id": "f1826dec-ca63-4529-8828-be739d5da60e",
+      "name": "Stringify"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9bc2e3bb-0e8d-49d3-9359-6f665a997dc3",
+              "leftValue": "={{ $json.action }}",
+              "rightValue": "spelling",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -40,
+        -120
+      ],
+      "id": "24d32dcd-f6e3-4b9e-a3ee-88ea86913aa3",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Now, translate the following text: \"{{ $json.text }}\"",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are an AI translator with automatic language detection, specializing in French and English translations.\n\nInstructions:\n- Detect the input language.  \n- Translate accurately between French and English while maintaining the original meaning, tone, and style.\n- Preserve proper nouns unless clearly misspelled.  \n- Ensure correct grammar, spelling, and natural sentence structure in the target language.  \n- Begin with an uppercase letter and end with a period, unless it's a question or exclamation.  \n- Return the translated version inside <translated></translated>"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        240,
+        -20
+      ],
+      "id": "f8d1ffbb-1047-492d-a3b4-d961bd752e56",
+      "name": "Translate LLM"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Now, correct the following text: \"{{ $json.text }}\"",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are an AI language corrector with automatic language detection.\n\nInstructions:\n- Detect the input language.\n- Correct spelling and sentence logics.\n- Begin with an uppercase letter and end with a period, unless a question or exclamation.\n- Do not change proper nouns unless clearly misspelled.\n- Return the corrected version in the original language inside <corrected></corrected>\n"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        240,
+        -220
+      ],
+      "id": "4dfceafa-c088-4458-b28d-92d7ed79b47e",
+      "name": "Spelling LLM"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -500,
+        60
+      ],
+      "id": "42a097a1-aeb8-47f3-bb2e-b9945a96faa4",
+      "name": "Chat",
+      "webhookId": "15a5a3fd-8d39-431a-bf32-30627fc3a593"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1afe2cc9-a1fe-4898-b2c6-308553f9deec",
+              "name": "action",
+              "value": "={{ $json.body?.action || 'spelling' }}",
+              "type": "string"
+            },
+            {
+              "id": "3ec40cd4-fae1-4939-bec0-248e39e747ff",
+              "name": "text",
+              "value": "={{ \n  $json.body?.text || \n  $json.chatInput\n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -260,
+        -120
+      ],
+      "id": "f7069221-d756-418f-8336-ba946710e61f",
+      "name": "Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Spelling LLM",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Translate LLM",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stringify": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Spelling LLM",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Translate LLM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate LLM": {
+      "main": [
+        [
+          {
+            "node": "Stringify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spelling LLM": {
+      "main": [
+        [
+          {
+            "node": "Stringify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat": {
+      "main": [
+        [
+          {
+            "node": "Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "79ca6dc5-e129-4771-ac65-a915f45b2e6d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fbb08ce223e381a85ffc633f2bf5fc3553553e0bab8956102be6463bb6f78758"
+  },
+  "id": "0T4RWW2obVZeTsat",
+  "tags": []
+}
