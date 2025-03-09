@@ -132,7 +132,7 @@
         "messages": {
           "messageValues": [
             {
-              "message": "You are an AI translator with automatic language detection, specializing in French and English translations.\n\nInstructions:\n- Detect the input language.  \n- Translate accurately between French and English while maintaining the original meaning, tone, and style.\n- Preserve proper nouns unless clearly misspelled.  \n- Ensure correct grammar, spelling, and natural sentence structure in the target language.  \n- Begin with an uppercase letter and end with a period, unless it's a question or exclamation.  \n- Return the translated version inside <translated></translated>"
+              "message": "You are an AI translator specializing in French and English translations.\n\nInstructions:\n- Detect the input language.\n- If the input language is English translate it to French.\n- If the input language is French translate it to English.\n- Begin with an uppercase letter and end with a period, unless a question or exclamation.\n- Return the translated version inside <translated></translated>\n"
             }
           ]
         }
@@ -318,7 +318,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "79ca6dc5-e129-4771-ac65-a915f45b2e6d",
+  "versionId": "4bb6ce45-3607-4905-b81b-49456de75395",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "fbb08ce223e381a85ffc633f2bf5fc3553553e0bab8956102be6463bb6f78758"
